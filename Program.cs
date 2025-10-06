@@ -1,6 +1,8 @@
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
+app.MapGet("/ping", async http => await http.Response.WriteAsync("Pong"));
+
 app.MapGet("/download", async http =>
 {
     var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", "whitelist.txt");

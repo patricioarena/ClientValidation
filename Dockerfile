@@ -1,12 +1,18 @@
-﻿FROM mcr.microsoft.com/dotnet/runtime:9.0 AS base
-USER $APP_UID
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+# Configuración para producción
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV DOTNET_ENVIRONMENT=Production
+ENV ASPNETCORE_URLS=http://+:8080
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
+
 WORKDIR /src
 COPY ["ClientValidation.csproj", "./"]
 RUN dotnet restore "ClientValidation.csproj"
+
 COPY . .
 WORKDIR "/src/"
 RUN dotnet build "./ClientValidation.csproj" -c $BUILD_CONFIGURATION -o /app/build
@@ -17,5 +23,10 @@ RUN dotnet publish "./ClientValidation.csproj" -c $BUILD_CONFIGURATION -o /app/p
 
 FROM base AS final
 WORKDIR /app
+# Copiar los archivos publicados
 COPY --from=publish /app/publish .
+# Asegurar que el directorio Resources existe y tiene los permisos correctos
+RUN mkdir -p /app/Resources && \
+    chmod -R 755 /app/Resources
+    
 ENTRYPOINT ["dotnet", "ClientValidation.dll"]

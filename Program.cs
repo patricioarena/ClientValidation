@@ -5,7 +5,7 @@ app.MapGet("/ping", async http => await http.Response.WriteAsync("Pong"));
 
 app.MapGet("/download", async http =>
 {
-    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", "whitelist.txt");
+    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "whitelist.txt");
     if (!File.Exists(filePath))
     {
         http.Response.StatusCode = 404;
